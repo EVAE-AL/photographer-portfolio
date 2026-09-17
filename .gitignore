@@ -1,0 +1,32 @@
+# --- 密钥与敏感信息 (永远不要提交) ---
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+*.crt
+config.*.local.json
+*_secret*.json
+*.creds
+secrets/
+credentials/
+
+# --- 构建产物 / 发布包 ---
+photographer-portfolio-*.zip
+dist/
+build/
+*.log
+
+# --- 编辑器 / 系统杂项 ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.suo
+*.user
+
+# --- 依赖(如以后引入) ---
+node_modules/
