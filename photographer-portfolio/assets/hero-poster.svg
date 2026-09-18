@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="摄影作品集首屏背景">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eeeae5"/>
+      <stop offset="0.52" stop-color="#d8d2cb"/>
+      <stop offset="1" stop-color="#bdb5ac"/>
+    </linearGradient>
+    <radialGradient id="light" cx="22%" cy="24%" r="72%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".76"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".8"/>
+      <stop offset=".35" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset=".78" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#base)"/>
+  <rect width="1600" height="1000" fill="url(#light)"/>
+  <rect width="1600" height="1000" fill="url(#fade)"/>
+</svg>

@@ -93,7 +93,7 @@ h1,h2,h3{margin:0;font-weight:400;letter-spacing:0}
   -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 110px);
   mask-image:linear-gradient(180deg,transparent 0,#000 110px);
 }
-.hero-video{width:100%;height:100%;object-fit:cover;opacity:0;will-change:opacity}
+.hero-video{width:100%;height:100%;object-fit:cover;opacity:1;will-change:opacity}
 
 .hero-overlay{
   position:absolute;inset:0;z-index:1;pointer-events:none;

@@ -1,0 +1,6 @@
+# Shen Yan Photography
+User-agent: *
+Allow: /
+
+# 域名确定后：取消下一行注释，并把域名换成真实地址
+# Sitemap: https://你的域名/sitemap.xml

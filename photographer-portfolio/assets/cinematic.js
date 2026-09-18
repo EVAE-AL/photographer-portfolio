@@ -55,10 +55,16 @@
     var promise = video.play();
     if (promise && typeof promise.catch === "function") {
       promise.catch(function () {
-        /* 浏览器拦截自动播放时，保留当前帧，不做处理 */
+        video.style.opacity = "1";
+        stopLoop();
       });
     }
   }
+
+  video.addEventListener("error", function () {
+    video.style.opacity = "1";
+    stopLoop();
+  });
 
   video.addEventListener("ended", function () {
     video.style.opacity = "0";
