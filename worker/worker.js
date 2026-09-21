@@ -106,36 +106,9 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
 
-    // 临时诊断接口：浏览器打开 /diag，只报告配置与到飞书的连通性，不会发消息
+    // 健康检查：不暴露任何配置信息
     if (request.method === "GET") {
-      const diagUrl = new URL(request.url);
-      if (diagUrl.pathname === "/diag") {
-        const rawUrl = (env.WEBHOOK_URL || "").trim();
-        const info = {
-          webhookKind: env.WEBHOOK_KIND || null,
-          webhookUrlSet: rawUrl.length > 0,
-          webhookUrlLength: rawUrl.length,
-          webhookUrlPrefix: rawUrl.slice(0, 34) || null,
-          webhookUrlHasWhitespace: /\s/.test(rawUrl),
-          allowedOrigin: env.ALLOWED_ORIGIN || null,
-          envKeys: Object.keys(env).sort()
-        };
-        const startedAt = Date.now();
-        try {
-          const probe = await fetch("https://open.feishu.cn/", { method: "GET" });
-          info.feishuReachable = true;
-          info.feishuStatus = probe.status;
-        } catch (e) {
-          info.feishuReachable = false;
-          info.feishuError = String(e && e.message ? e.message : e).slice(0, 300);
-        }
-        info.feishuMs = Date.now() - startedAt;
-        return new Response(JSON.stringify(info, null, 2), {
-          status: 200,
-          headers: { "Content-Type": "application/json; charset=utf-8" }
-        });
-      }
-      return json({ ok: false, error: "method_not_allowed" }, 405, origin);
+      return json({ ok: true }, 200, origin);
     }
 
     if (request.method !== "POST") {
