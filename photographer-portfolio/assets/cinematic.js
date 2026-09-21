@@ -314,6 +314,7 @@
     setNote("正在发送…", true);
 
     var settled = false;
+    var startedAt = Date.now();
     var timer = setTimeout(function () {
       finish("发送超时了，请直接发邮件到 " + FALLBACK_MAIL + "。", false);
     }, 15000);
@@ -329,12 +330,14 @@
 
     fetch(FORM_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/plain;charset=UTF-8" },
       body: JSON.stringify(payload)
     }).then(function (response) {
       if (!response.ok) throw new Error("HTTP " + response.status);
+      console.log("[booking] 发送成功，耗时 " + (Date.now() - startedAt) + "ms");
       finish("已收到你的预约信息，我会尽快回复。", true);
-    }).catch(function () {
+    }).catch(function (err) {
+      console.error("[booking] 发送失败，耗时 " + (Date.now() - startedAt) + "ms", err);
       finish("发送失败了，请直接发邮件到 " + FALLBACK_MAIL + "。", false);
     });
   });

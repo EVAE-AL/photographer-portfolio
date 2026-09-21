@@ -94,8 +94,48 @@ export default {
   async fetch(request, env) {
     const origin = (env.ALLOWED_ORIGIN || "https://evae-al.github.io").trim();
 
+    const startedAt = Date.now();
+
+    // 来源校验：浏览器跨域请求一定带 Origin，不是本站就拒掉
+    const requestOrigin = (request.headers.get("Origin") || "").trim();
+    if (requestOrigin && requestOrigin !== origin) {
+      return json({ ok: false, error: "origin_not_allowed" }, 403, origin);
+    }
+
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
+    }
+
+    // 临时诊断接口：浏览器打开 /diag，只报告配置与到飞书的连通性，不会发消息
+    if (request.method === "GET") {
+      const diagUrl = new URL(request.url);
+      if (diagUrl.pathname === "/diag") {
+        const rawUrl = (env.WEBHOOK_URL || "").trim();
+        const info = {
+          webhookKind: env.WEBHOOK_KIND || null,
+          webhookUrlSet: rawUrl.length > 0,
+          webhookUrlLength: rawUrl.length,
+          webhookUrlPrefix: rawUrl.slice(0, 34) || null,
+          webhookUrlHasWhitespace: /\s/.test(rawUrl),
+          allowedOrigin: env.ALLOWED_ORIGIN || null,
+          envKeys: Object.keys(env).sort()
+        };
+        const startedAt = Date.now();
+        try {
+          const probe = await fetch("https://open.feishu.cn/", { method: "GET" });
+          info.feishuReachable = true;
+          info.feishuStatus = probe.status;
+        } catch (e) {
+          info.feishuReachable = false;
+          info.feishuError = String(e && e.message ? e.message : e).slice(0, 300);
+        }
+        info.feishuMs = Date.now() - startedAt;
+        return new Response(JSON.stringify(info, null, 2), {
+          status: 200,
+          headers: { "Content-Type": "application/json; charset=utf-8" }
+        });
+      }
+      return json({ ok: false, error: "method_not_allowed" }, 405, origin);
     }
 
     if (request.method !== "POST") {
@@ -104,7 +144,8 @@ export default {
 
     let raw;
     try {
-      raw = await request.json();
+      const bodyText = await request.text();
+      raw = bodyText ? JSON.parse(bodyText) : null;
     } catch (e) {
       return json({ ok: false, error: "invalid_json" }, 400, origin);
     }
@@ -145,6 +186,7 @@ export default {
       return json({ ok: false, error: "send_failed", detail: String(e.message || e).slice(0, 200) }, 500, origin);
     }
 
-    return json({ ok: true }, 200, origin);
+    console.log("relay ok in " + (Date.now() - startedAt) + "ms");
+    return json({ ok: true, ms: Date.now() - startedAt }, 200, origin);
   }
 };
