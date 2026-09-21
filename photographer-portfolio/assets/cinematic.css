@@ -270,6 +270,9 @@ form{display:grid;gap:20px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .form-note{font-size:12.5px;color:var(--muted);margin:0}
 
+/* 蜜罐字段：真人看不见、也不参与布局，只有机器人会填 */
+.honeypot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
 /* ---------- 页脚 ---------- */
 footer{border-top:1px solid var(--line);padding:28px 0}
 .foot-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
@@ -399,6 +402,7 @@ footer{border-top:1px solid var(--line);padding:28px 0}
 }
 .field-error{margin:7px 0 0;font-size:12px;line-height:1.5;color:#B4451F}
 .booking-submit{justify-self:start}
+.btn-pill:disabled{opacity:.55;cursor:not-allowed;transform:none}
 
 /* ---------- 影像助手 ---------- */
 .photo-assistant{position:fixed;right:24px;bottom:24px;z-index:80;font-family:var(--sans)}

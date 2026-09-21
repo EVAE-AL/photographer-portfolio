@@ -1,0 +1,20 @@
+# Cloudflare Worker 配置
+# 部署命令： npx wrangler deploy
+#
+# 机器人密钥不写在这里，用下面的命令存成加密环境变量：
+#   npx wrangler secret put WEBHOOK_URL
+#   npx wrangler secret put TELEGRAM_BOT_TOKEN
+#   npx wrangler secret put TELEGRAM_CHAT_ID
+
+name = "booking-relay"
+main = "worker.js"
+compatibility_date = "2026-09-21"
+
+[vars]
+# 机器人类型：telegram | feishu | dingtalk | wecom | generic
+WEBHOOK_KIND = "telegram"
+# 只允许你的站点调用这个接口
+ALLOWED_ORIGIN = "https://evae-al.github.io"
+
+# 自定义域名（可选，先不用）
+# routes = [{ pattern = "api.example.com/*", custom_domain = true }]

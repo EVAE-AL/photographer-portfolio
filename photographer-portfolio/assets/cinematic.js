@@ -179,6 +179,10 @@
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   var LIMITS = { name: 40, contact: 120, city: 80, message: 1000 };
 
+  /* 部署 Cloudflare Worker 后，把它的地址填在这里；留空则退回本机邮件。 */
+  var FORM_ENDPOINT = "";
+  var FALLBACK_MAIL = "hello@shenyan.photo";
+
   function limited(value, max) {
     return String(value || "").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, max);
   }
@@ -207,8 +211,43 @@
     if (e.target.matches("input, textarea, select")) setError(e.target, "");
   });
 
+  function setNote(message, ok) {
+    note.textContent = message;
+    note.style.color = ok === false ? "#B4451F" : "#6F6F6F";
+  }
+
+  function pretendSuccess() {
+    form.reset();
+    setNote("已收到你的预约信息，我会尽快回复。", true);
+  }
+
+  function sendByMail(payload) {
+    var lines = [
+      "称呼：" + payload.name,
+      "联系方式：" + payload.contact,
+      "拍摄类型：" + payload.type,
+      "期望日期：" + (payload.date || "未填写"),
+      "拍摄城市：" + (payload.city || "未填写"),
+      "",
+      "需求描述：",
+      payload.message || "未填写"
+    ];
+
+    window.location.href = "mailto:" + FALLBACK_MAIL + "?subject=" +
+      encodeURIComponent("拍摄预约 - " + payload.name) +
+      "&body=" + encodeURIComponent(lines.join(String.fromCharCode(10)));
+
+    setNote("已调用邮件客户端；如果没有反应，请直接发邮件到 " + FALLBACK_MAIL + "。", true);
+  }
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
+
+    var honey = form.querySelector('input[name="website"]');
+    if (honey && honey.value) {
+      pretendSuccess();
+      return;
+    }
 
     var nameEl = document.getElementById("fName");
     var contactEl = document.getElementById("fContact");
@@ -256,23 +295,48 @@
     }
 
     var data = new FormData(form);
-    var lines = [
-      "称呼：" + name,
-      "联系方式：" + contact,
-      "拍摄类型：" + data.get("type"),
-      "期望日期：" + (data.get("date") || "未填写"),
-      "拍摄城市：" + (city || "未填写"),
-      "",
-      "需求描述：",
-      message || "未填写"
-    ];
+    var payload = {
+      name: name,
+      contact: contact,
+      type: data.get("type"),
+      date: data.get("date") || "",
+      city: city,
+      message: message
+    };
 
-    window.location.href = "mailto:hello@shenyan.photo?subject=" +
-      encodeURIComponent("拍摄预约 - " + name) +
-      "&body=" + encodeURIComponent(lines.join(String.fromCharCode(10)));
+    if (!FORM_ENDPOINT) {
+      sendByMail(payload);
+      return;
+    }
 
-    note.textContent = "已调用邮件客户端；如果没有反应，请直接发邮件到 hello@shenyan.photo。";
-    note.style.color = "#6F6F6F";
+    var submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    setNote("正在发送…", true);
+
+    var settled = false;
+    var timer = setTimeout(function () {
+      finish("发送超时了，请直接发邮件到 " + FALLBACK_MAIL + "。", false);
+    }, 15000);
+
+    function finish(message, ok) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (submitBtn) submitBtn.disabled = false;
+      if (ok) form.reset();
+      setNote(message, ok);
+    }
+
+    fetch(FORM_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function (response) {
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      finish("已收到你的预约信息，我会尽快回复。", true);
+    }).catch(function () {
+      finish("发送失败了，请直接发邮件到 " + FALLBACK_MAIL + "。", false);
+    });
   });
 })();
 
