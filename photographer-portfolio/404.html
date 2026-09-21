@@ -7,6 +7,20 @@
 <meta name="robots" content="noindex" />
 <title>页面不存在 · 沈砚 SHEN YAN</title>
 <meta name="description" content="这个页面不存在或已经移动。" />
+<base id="baseHref" href="/photographer-portfolio/" />
+<script>
+(function () {
+  var segs = location.pathname.split('/').filter(Boolean);
+  document.getElementById('baseHref').href = segs[0] === 'photographer-portfolio' ? '/photographer-portfolio/' : '/';
+  document.addEventListener('click', function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    ev.preventDefault();
+    var target = document.getElementById(a.getAttribute('href').slice(1));
+    if (target) { target.scrollIntoView({ behavior: 'smooth' }); } else { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  });
+})();
+</script>
 <link rel="icon" href="favicon.ico" sizes="any" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
