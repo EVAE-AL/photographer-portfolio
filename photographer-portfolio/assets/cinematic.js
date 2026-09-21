@@ -180,7 +180,7 @@
   var LIMITS = { name: 40, contact: 120, city: 80, message: 1000 };
 
   /* 部署 Cloudflare Worker 后，把它的地址填在这里；留空则退回本机邮件。 */
-  var FORM_ENDPOINT = "";
+  var FORM_ENDPOINT = "https://booking-relay.shenyan-studio.workers.dev";
   var FALLBACK_MAIL = "hello@shenyan.photo";
 
   function limited(value, max) {
